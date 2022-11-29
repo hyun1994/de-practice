@@ -1,6 +1,11 @@
-package org.de.jdbc.crudexample;
+package org.de.jdbc.resultset.pojomapping;
+
+import org.de.jdbc.mapper.Product;
+import org.de.jdbc.mapper.ResultSetMapper;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -12,12 +17,14 @@ public class Main {
             System.out.println(databaseMetaData.getDriverName() + ", " + databaseMetaData.getDriverVersion());
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery("select * from product");
+            List<Product> products = new ArrayList<>();
             while(rs.next()){
-                System.out.println(rs.getInt(1)+" "+rs.getString(2)+" "
-                        +rs.getDate(3)+" "+rs.getString(4)
-                        +" "+rs.getInt(5));
+                Product product = ResultSetMapper.create(rs);
+                products.add(product);
             }
-            Thread.sleep(5*60*1000);
+
+            products.stream().forEach(it -> it.setPrice(it.getPrice() - 1000));
+
             con.close();
         } catch (Exception e) {System.out.println(e);}
     }
